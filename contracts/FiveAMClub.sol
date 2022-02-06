@@ -9,7 +9,7 @@ import "./libraries/Base64.sol";
 import "./libraries/CheckTime.sol";
 import "./libraries/IterableMapping.sol";
 
-contract FiveAmClub is CheckTime, ERC721 {
+contract FiveAmClub is ERC721 {
     struct MemberAttributes {
         string name;
         uint8 timeZone;
@@ -21,6 +21,8 @@ contract FiveAmClub is CheckTime, ERC721 {
     using SafeMath for uint256;
     using SafeMath for uint8;
     using SafeMath for uint256;
+
+    using CheckTime for uint;
 
     using IterableMapping for IterableMapping.Map;
 
@@ -54,6 +56,7 @@ contract FiveAmClub is CheckTime, ERC721 {
 
         string memory wokeUp = Strings.toString(memberAttributes.wokeUp);
         string memory timeZone = Strings.toString(memberAttributes.timeZone);
+        string memory logo = "ipfs://Qmei6uCXEWdBJhnfC1QbxGcdSo2TcQGfgCvEMWksMbQZnu";
 
         string memory json = Base64.encode(
             bytes(
@@ -64,7 +67,7 @@ contract FiveAmClub is CheckTime, ERC721 {
                         " -- NFT #: ",
                         Strings.toString(_tokenId),
                         '", "image": "',
-                        memberAttributes.name,
+                        logo,
                         '", "wokeUp": "',
                         wokeUp,
                         '", "timeZone": "',
@@ -121,7 +124,7 @@ contract FiveAmClub is CheckTime, ERC721 {
 
         if (membersTimeZone < 13) {
             require(
-                getHour(
+                CheckTime.getHour(
                     block.timestamp.add(membersTimeZone.mul(SECONDS_IN_HOUR))
                 ) >= 6,
                 "Too early"
@@ -131,7 +134,7 @@ contract FiveAmClub is CheckTime, ERC721 {
         if (membersTimeZone >= 13) {
             uint256 timeToDecrease = membersTimeZone.sub(12);
             require(
-                getHour(
+                CheckTime.getHour(
                     block.timestamp.sub(timeToDecrease.mul(SECONDS_IN_HOUR))
                 ) >= 6,
                 "Too early"
@@ -173,7 +176,7 @@ contract FiveAmClub is CheckTime, ERC721 {
 
         if (membersTimeZone < 13) {
             require(
-                getHour(
+                CheckTime.getHour(
                     block.timestamp.add(membersTimeZone.mul(SECONDS_IN_HOUR))
                 ) == 5,
                 "Too early or late"
@@ -183,7 +186,7 @@ contract FiveAmClub is CheckTime, ERC721 {
         if (membersTimeZone >= 13) {
             uint256 timeToDecrease = membersTimeZone.sub(12);
             require(
-                getHour(
+                CheckTime.getHour(
                     block.timestamp.sub(timeToDecrease.mul(SECONDS_IN_HOUR))
                 ) == 5,
                 "Too early or late"
