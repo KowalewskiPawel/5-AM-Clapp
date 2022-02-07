@@ -147,10 +147,11 @@ const Hero = ({
             Wake Up with <br />5 AM Clapp
           </Title>
           <Description>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
+            Waking up at 5 AM has many advantages, you can finally find extra
+            time for your hobbies, business or general well-being. However, many
+            of us struggle to find enough motivation/ discipline. Change it
+            today! Stake your money with 5 AM Clapp, wake up to get it back,
+            plus earn some extra cash from rewards. Join our clapp today! :)
           </Description>
           {warning && (
             <Warning>
