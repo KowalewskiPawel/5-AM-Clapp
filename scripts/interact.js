@@ -2,7 +2,7 @@ const API_KEY = process.env.API_KEY;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
 
-const contract = require("../artifacts/contracts/FiveAmClub.sol/FiveAmClub.json");
+const contract = require("../artifacts/contracts/FiveAmClapp.sol/FiveAmClapp.json");
 
 const alchemyProvider = new ethers.providers.AlchemyProvider(
   (network = "maticmum"),
@@ -11,7 +11,7 @@ const alchemyProvider = new ethers.providers.AlchemyProvider(
 
 const signer = new ethers.Wallet(PRIVATE_KEY, alchemyProvider);
 
-const FiveAmClubContract = new ethers.Contract(
+const FiveAmClappContract = new ethers.Contract(
   CONTRACT_ADDRESS,
   contract.abi,
   signer
@@ -23,7 +23,7 @@ const FiveAmClubContract = new ethers.Contract(
     process.stdout.write(".");
   }, 1000);
 
-  await FiveAmClubContract.stakeCommitment({
+  await FiveAmClappContract.stakeCommitment({
     value: 100,
   });
 

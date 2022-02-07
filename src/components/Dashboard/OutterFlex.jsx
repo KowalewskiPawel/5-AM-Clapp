@@ -1,11 +1,11 @@
 import styled, { css } from "styled-components";
 
-const OutterWrapper = styled.div`
+const OutterFlex = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
   padding: 0px;
-  gap: 20px;
+  gap: 10px;
 
   ${(props) =>
     props.isLoading &&
@@ -15,4 +15,4 @@ const OutterWrapper = styled.div`
     `}
 `;
 
-export default OutterWrapper;
+export default OutterFlex;

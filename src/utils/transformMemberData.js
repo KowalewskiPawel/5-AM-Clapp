@@ -1,8 +1,13 @@
+import { ethers } from "ethers";
+
 const transformMemberData = (memberData) => {
   return {
     name: memberData.name,
-    commitments: memberData.wokeUp.toNumber(),
-    timeZone: memberData.timeZone.toNumber(),
+    wokeUp: memberData.wokeUp.toNumber(),
+    attempts: memberData.attempts.toNumber(),
+    totalStaked: ethers.utils.formatEther(memberData.totalStaked),
+    totalClaimed: ethers.utils.formatEther(memberData.totalClaimed),
+    fiveAmTokens: memberData.fiveAmTokens.toNumber(),
   };
 };
 

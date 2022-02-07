@@ -10,10 +10,28 @@ import Title from "./Title";
 import Description from "./Description";
 import StyledButton from "./StyledButton";
 import Warning from "./Warning";
+import Loading from "../Loading";
 
-const Hero = ({ currentAccount, mintNFT }) => {
+const Hero = ({
+  currentAccount,
+  nftMinted,
+  mintNFT,
+  isMinting,
+  mintingError,
+  setMintingError,
+  setIsDashboardOpen,
+  isFetching,
+}) => {
   const [isJoining, setIsJoining] = useState(false);
   const [warning, setWarning] = useState(false);
+  const [memberNickname, setMemberNickname] = useState("");
+  const [memberTimeZone, setMemberTimeZone] = useState(0);
+
+  const submitForm = (event) => {
+    event.preventDefault();
+
+    mintNFT(memberNickname, memberTimeZone);
+  };
 
   const checkConnection = () => {
     if (!currentAccount) {
@@ -21,11 +39,47 @@ const Hero = ({ currentAccount, mintNFT }) => {
     }
 
     setWarning(false);
-
     setIsJoining(true);
   };
 
   const renderSwitch = () => {
+    if (nftMinted) {
+      return (
+        <OutterWrapper>
+          <Title>Congratulations! Now you are a member of 5 AM Clapp :)</Title>
+          <Description>
+            Click "OK" to move to the user dashboard, from where you can stake
+            your commitments, track your achievement, and clam the rewards.
+          </Description>
+          <StyledButton onClick={setIsDashboardOpen(true)}>
+            <span>OK</span>
+          </StyledButton>
+        </OutterWrapper>
+      );
+    }
+
+    if (mintingError) {
+      return (
+        <OutterWrapper isLoading={true}>
+          <Warning>Error :( Please try again</Warning>
+          <StyledButton onClick={() => setMintingError(false)}>
+            <span>Try Again</span>
+          </StyledButton>
+        </OutterWrapper>
+      );
+    }
+
+    if (isMinting) {
+      return (
+        <OutterWrapper isLoading={true}>
+          <Description>
+            {isFetching ? "Loading " : "Minting "}Membership NFT
+          </Description>
+          <Loading />
+        </OutterWrapper>
+      );
+    }
+
     if (isJoining && currentAccount) {
       return (
         <OutterWrapper>
@@ -33,19 +87,26 @@ const Hero = ({ currentAccount, mintNFT }) => {
             Please create your unique NFT membership token of Five AM Clapp, so
             that you can track your achievements and claim the rewards! :)
           </Description>
-          <StyledForm>
+          <StyledForm id="mint_nft" onSubmit={submitForm}>
             <StyledInputRow>
-              <label for="nickname">Nickname: </label>
+              <label htmlFor="nickname">Nickname: </label>
               <StyledInput
                 type="text"
                 placeholder="Enter your nickname"
                 name="nickname"
+                value={memberNickname}
+                onChange={(event) => setMemberNickname(event.target.value)}
                 required
               />
             </StyledInputRow>
             <StyledInputRow>
-              <label for="time_zone">Time Zone: </label>
-              <StyledSelect name="time_zone">
+              <label htmlFor="time_zone">Time Zone: </label>
+              <StyledSelect
+                name="time_zone"
+                defaultValue={0}
+                required
+                onChange={(event) => setMemberTimeZone(event.target.value)}
+              >
                 <option value={23}>GMT-11:00</option>
                 <option value={22}>GMT-10:00</option>
                 <option value={21}>GMT-9:00</option>
@@ -56,9 +117,7 @@ const Hero = ({ currentAccount, mintNFT }) => {
                 <option value={16}>GMT-4:00</option>
                 <option value={15}>GMT-3:00</option>
                 <option value={13}>GMT-1:00</option>
-                <option value={0} selected>
-                  GMT
-                </option>
+                <option value={0}>GMT</option>
                 <option value={1}>GMT+1:00</option>
                 <option value={2}>GMT+2:00</option>
                 <option value={3}>GMT+3:00</option>
@@ -74,7 +133,7 @@ const Hero = ({ currentAccount, mintNFT }) => {
               </StyledSelect>
             </StyledInputRow>
           </StyledForm>
-          <StyledButton>
+          <StyledButton type="submit" form="mint_nft">
             <span>Mint Membership NFT</span>
           </StyledButton>
         </OutterWrapper>

@@ -9,20 +9,23 @@ import "./libraries/Base64.sol";
 import "./libraries/CheckTime.sol";
 import "./libraries/IterableMapping.sol";
 
-contract FiveAmClub is ERC721 {
+contract FiveAmClapp is ERC721 {
     struct MemberAttributes {
         string name;
-        uint8 timeZone;
+        uint256 timeZone;
         uint256 wokeUp;
+        uint256 attempts;
+        uint256 totalStaked;
+        uint256 totalClaimed;
+        uint256 fiveAmTokens;
     }
 
     uint256 constant SECONDS_IN_HOUR = 3600;
 
     using SafeMath for uint256;
-    using SafeMath for uint8;
     using SafeMath for uint256;
 
-    using CheckTime for uint;
+    using CheckTime for uint256;
 
     using IterableMapping for IterableMapping.Map;
 
@@ -38,9 +41,10 @@ contract FiveAmClub is ERC721 {
 
     event MembershipNFTMinted(address sender, uint256 tokenId);
 
-    uint256 public rewardsPool;
+    uint256 private rewardsPool;
+    uint256 private totalStakedPool;
 
-    constructor() payable ERC721("5AM Club Membership NFT", "5AMFT") {
+    constructor() payable ERC721("5AM Clapp Membership NFT", "5AMFT") {
         _tokenIds.increment();
     }
 
@@ -54,9 +58,40 @@ contract FiveAmClub is ERC721 {
             _tokenId
         ];
 
+        string memory timeZoneString;
+
+        if (memberAttributes.timeZone == 0) {
+            timeZoneString = "GMT";
+        }
+
+        if (memberAttributes.timeZone < 13 && memberAttributes.timeZone < 0) {
+            string memory timeZone = Strings.toString(
+                memberAttributes.timeZone
+            );
+
+            string memory gmt = "GMT+";
+            timeZoneString = string(abi.encodePacked(gmt, " ", timeZone));
+        }
+
+        if (memberAttributes.timeZone > 13) {
+            uint256 correctZone = memberAttributes.timeZone.sub(12);
+
+            string memory timeZone = Strings.toString(correctZone);
+
+            string memory gmt = "GMT-";
+            timeZoneString = string(abi.encodePacked(gmt, " ", timeZone));
+        }
+
         string memory wokeUp = Strings.toString(memberAttributes.wokeUp);
-        string memory timeZone = Strings.toString(memberAttributes.timeZone);
-        string memory logo = "ipfs://Qmei6uCXEWdBJhnfC1QbxGcdSo2TcQGfgCvEMWksMbQZnu";
+        string memory attempts = Strings.toString(memberAttributes.attempts);
+        string memory totalStaked = Strings.toString(
+            memberAttributes.totalStaked
+        );
+        string memory fiveAmTokens = Strings.toString(
+            memberAttributes.fiveAmTokens
+        );
+        string
+            memory logo = "https://gateway.pinata.cloud/ipfs/QmZyxa5JSatxUNdY9xDfz5ddJVg7bFXaKxxRU814X3PMa2";
 
         string memory json = Base64.encode(
             bytes(
@@ -64,15 +99,21 @@ contract FiveAmClub is ERC721 {
                     abi.encodePacked(
                         '{"name": "',
                         memberAttributes.name,
-                        " -- NFT #: ",
+                        "FiveAmClapp Member No: ",
                         Strings.toString(_tokenId),
-                        '", "image": "',
+                        '", "description": "Five AM Clapp Membership NFT Token.", "image": "',
                         logo,
-                        '", "wokeUp": "',
+                        '","attributes": [ { "trait_type": "Woke up", "value": ',
                         wokeUp,
-                        '", "timeZone": "',
-                        timeZone,
-                        '", }'
+                        '}, { "trait_type": "Attempts", "value": ',
+                        attempts,
+                        '}, { "trait_type": "Total Staked", "value": ',
+                        totalStaked,
+                        '}, { "trait_type": "Five AM Tokens", "value": ',
+                        fiveAmTokens,
+                        '}, { "trait_type": "Time Zone", "value": ',
+                        timeZoneString,
+                        "} ]}"
                     )
                 )
             )
@@ -95,7 +136,27 @@ contract FiveAmClub is ERC721 {
         }
     }
 
-    function mintMembershipNFT(string memory _name, uint8 _timeZone) external {
+    function getTotalStakedPool() public view returns (uint256) {
+        require(nftHolders[msg.sender] > 0, "You need membership to see this");
+        return totalStakedPool;
+    }
+
+    function getRewardsPool() public view returns (uint256) {
+        require(nftHolders[msg.sender] > 0, "You need membership to see this");
+        return rewardsPool;
+    }
+
+    function didStake() public view returns (uint) {
+        if(block.timestamp < stakedTime.get(msg.sender).add(SECONDS_IN_HOUR.mul(18))) {
+            return stakes.get(msg.sender);
+        }
+
+        return 0;
+    }
+
+    function mintMembershipNFT(string memory _name, uint256 _timeZone)
+        external
+    {
         require(
             nftHolders[msg.sender] == 0,
             "Only one membership per address allowed"
@@ -107,7 +168,11 @@ contract FiveAmClub is ERC721 {
         nftHolderAttributes[newItemId] = MemberAttributes({
             name: _name,
             timeZone: _timeZone,
-            wokeUp: 0
+            wokeUp: 0,
+            attempts: 0,
+            totalStaked: 0,
+            totalClaimed: 0,
+            fiveAmTokens: 0
         });
 
         nftHolders[msg.sender] = newItemId;
@@ -118,6 +183,9 @@ contract FiveAmClub is ERC721 {
     }
 
     modifier areAllConditionsMet() {
+        require(nftHolders[msg.sender] > 0, "You need membership to stake");
+        require(msg.value >= 0.00000001 ether, "Please stake more");
+
         uint256 idOfMemberNft = nftHolders[msg.sender];
         MemberAttributes storage member = nftHolderAttributes[idOfMemberNft];
         uint256 membersTimeZone = member.timeZone;
@@ -140,16 +208,25 @@ contract FiveAmClub is ERC721 {
                 "Too early"
             );
         }
-
-        require(nftHolders[msg.sender] > 0, "You need membership to stake");
-        require(msg.value >= 0.0001 ether, "Please stake more");
-        require(stakes.get(msg.sender) == 0, "You have already staked");
+        require(
+            CheckTime.getDay(stakedTime.get(msg.sender)) !=
+                CheckTime.getDay(block.timestamp),
+            "You can stake only once per day"
+        );
         _;
     }
 
     function stakeCommitment() public payable areAllConditionsMet {
+        uint256 idOfMemberNft = nftHolders[msg.sender];
+        MemberAttributes storage member = nftHolderAttributes[idOfMemberNft];
+
+        totalStakedPool.add(msg.value);
+
         stakes.set(msg.sender, msg.value);
         stakedTime.set(msg.sender, block.timestamp);
+
+        member.attempts = member.attempts.add(1);
+        member.totalStaked = member.totalStaked.add(msg.value);
     }
 
     modifier isExpired() {
@@ -161,13 +238,9 @@ contract FiveAmClub is ERC721 {
         _;
     }
 
-    modifier isMember() {
-        require(nftHolders[msg.sender] > 0, "You need membership to stake");
-        _;
-    }
-
-    function withdrawCommitment() external isMember {
+    function withdrawCommitment() external isExpired {
         require(stakes.get(msg.sender) > 0, "You haven't staked anything");
+        require(nftHolders[msg.sender] > 0, "You need membership to withdraw");
 
         uint256 idOfMemberNft = nftHolders[msg.sender];
         MemberAttributes storage member = nftHolderAttributes[idOfMemberNft];
@@ -198,6 +271,7 @@ contract FiveAmClub is ERC721 {
         stakes.set(msg.sender, 0);
 
         member.wokeUp = member.wokeUp.add(1);
+        member.fiveAmTokens = member.fiveAmTokens.add(1);
 
         uint256 currentTokens = tokensToSpend.get(msg.sender).add(1);
 
@@ -205,6 +279,11 @@ contract FiveAmClub is ERC721 {
 
         (bool sent, ) = msg.sender.call{value: amountToSendBack}("");
         require(sent, "Failed to send Matic");
+    }
+
+    modifier isMember() {
+        require(nftHolders[msg.sender] > 0, "You need membership to claim");
+        _;
     }
 
     function claimReward() external isMember {
@@ -229,6 +308,9 @@ contract FiveAmClub is ERC721 {
 
         require(rewardsPool > 0, "Rewards Pool empty :(");
 
+        uint256 idOfMemberNft = nftHolders[msg.sender];
+        MemberAttributes storage member = nftHolderAttributes[idOfMemberNft];
+
         for (uint256 i = 0; i < stakes.size(); i++) {
             address key = tokensToSpend.getKeyAtIndex(i);
 
@@ -244,6 +326,9 @@ contract FiveAmClub is ERC721 {
         uint256 currentTokens = tokensToSpend.get(msg.sender).sub(1);
 
         tokensToSpend.set(msg.sender, currentTokens);
+
+        member.fiveAmTokens = member.fiveAmTokens.sub(30);
+        member.totalClaimed = member.totalClaimed.add(reward);
 
         (bool sent, ) = msg.sender.call{value: reward}("");
         require(sent, "Failed to send Matic");
