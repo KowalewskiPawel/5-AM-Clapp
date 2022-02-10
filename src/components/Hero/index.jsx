@@ -51,7 +51,7 @@ const Hero = ({
             Click "OK" to move to the user dashboard, from where you can stake
             your commitments, track your achievement, and clam the rewards.
           </Description>
-          <StyledButton onClick={setIsDashboardOpen(true)}>
+          <StyledButton onClick={() => setIsDashboardOpen(true)}>
             <span>OK</span>
           </StyledButton>
         </OutterWrapper>

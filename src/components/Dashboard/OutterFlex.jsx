@@ -4,7 +4,6 @@ const OutterFlex = styled.div`
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  padding: 0px;
   gap: 10px;
 
   ${(props) =>
@@ -13,6 +12,10 @@ const OutterFlex = styled.div`
       width: 100%;
       align-items: center;
     `}
+
+  @media (max-width: 1180px) {
+    flex-direction: column;
+  }
 `;
 
 export default OutterFlex;

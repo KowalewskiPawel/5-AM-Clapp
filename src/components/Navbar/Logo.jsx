@@ -17,6 +17,18 @@ const Logo = styled.h1`
     width: 2rem;
     height: 2rem;
   }
+
+  @media (max-width: 880px) {
+    font-size: 1.2rem;
+    margin-right: 12%;
+
+    & > img {
+      top: 1.9rem;
+      margin-left: -2rem;
+      width: 1.2rem;
+      height: auto;
+    }
+  }
 `;
 
 export default Logo;

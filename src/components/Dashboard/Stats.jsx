@@ -6,6 +6,7 @@ const Stats = styled.div`
   justify-content: center;
   align-items: flex-start;
   gap: 10px;
+  height: auto;
 
   & > h1 {
     font-family: "Russo One", sans-serif;
@@ -28,8 +29,26 @@ const Stats = styled.div`
   }
 
   & > span > img {
-    margin-bottom: -0.2rem;
+    margin-bottom: -0.8rem;
     transform: scale(0.7);
+  }
+
+  @media (max-width: 1266px) {
+    & > h1 {
+      font-size: 24px;
+    }
+
+    & > span {
+      font-size: 14px;
+    }
+
+    & > article {
+      font-size: 12px;
+    }
+
+    & > button > span {
+      font-size: 14px;
+    }
   }
 `;
 

@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 import StyledDashboard from "./StyledDashboard";
 import OutterFlex from "./OutterFlex";
 import StatsFlex from "./StatsFlex";
@@ -15,6 +17,9 @@ import Attempts from "../../assets/Attempts.png";
 import Wins from "../../assets/Wins.png";
 import Matic from "../../assets/Matic.png";
 import Token from "../../assets/Token.png";
+import OutterWrapper from "../Hero/OutterWrapper";
+import MainFrame from "./MainFrame";
+import Rewards from "./UserDashboard";
 
 const Dashboard = ({
   memberBalance,
@@ -26,10 +31,18 @@ const Dashboard = ({
   withdrawBet,
   withdrawingError,
   isLoading,
+  rewardsError,
+  claimRewards,
 }) => {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
   const renderSwitch = () => {
     if (isLoading) {
-      return <Loading />;
+      return (
+        <OutterWrapper isLoading={true}>
+          <Loading />
+        </OutterWrapper>
+      );
     }
 
     if (stakedBet && stakedBet !== "0.0") {
@@ -80,12 +93,53 @@ const Dashboard = ({
     );
   };
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 100);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
   return (
     <StyledDashboard>
-      <OutterFlex>
+      <OutterFlex isDashboard={true}>
         <StatsFlex>
           <Stats>
-            <h1>Stats</h1>
+            <h1>Wallet</h1>
+            <span>
+              <img src={Matic} alt="Matic" /> MATIC:{" "}
+              {memberBalance?.slice(0, 10)}
+            </span>
+            <span>
+              <img src={Token} alt="Token" /> 5 AM Tokens:{" "}
+              {memberNFT.fiveAmTokens}
+            </span>
+            <Line />
+            <h1>Rewards</h1>
+            <span>Total Claimed: {memberNFT.totalClaimed} MATIC</span>
+            <span>Total Staked: {memberNFT.totalStaked} MATIC</span>
+            <Description>
+              <em>
+                You need at least 30 5AM tokens to be eligible for the rewards
+                pool. Each time you claim your reward, 30 5AM tokens are
+                withdrawn from your account.
+              </em>
+            </Description>
+            {rewardsError && (
+              <Warning>Something went wrong :( Please try again</Warning>
+            )}
+            <StyledButton onClick={claimRewards}>
+              <span>Claim Rewards</span>
+            </StyledButton>
+          </Stats>
+        </StatsFlex>
+        <MainFrame>
+          <Rewards>
+            <h1>User Dashboard</h1>
+            <span>Nickname: {memberNFT.name}</span>
+            <span>Local Time: {currentTime.toLocaleTimeString()}</span>
             <span>
               <img src={Attempts} alt="Attempts" /> Total Attempts:{" "}
               {memberNFT.attempts}
@@ -93,18 +147,9 @@ const Dashboard = ({
             <span>
               <img src={Wins} alt="Wins" /> Total Wins: {memberNFT.wokeUp}
             </span>
-            <Line />
-            <h1>Wallet</h1>
-            <span>
-              <img src={Matic} alt="Matic" /> MATIC: {memberBalance}
-            </span>
-            <span>
-              <img src={Token} alt="Token" /> 5 AM Tokens:{" "}
-              {memberNFT.fiveAmTokens}
-            </span>
-          </Stats>
-        </StatsFlex>
-        <Main>{renderSwitch()}</Main>
+          </Rewards>
+          <Main>{renderSwitch()}</Main>
+        </MainFrame>
       </OutterFlex>
     </StyledDashboard>
   );

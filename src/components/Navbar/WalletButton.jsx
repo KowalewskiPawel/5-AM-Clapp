@@ -35,6 +35,15 @@ const StyledWalletButton = styled.button`
         background: #a1c3a2;
       }
     `}
+
+  @media (max-width: 880px) {
+    gap: 5px;
+
+    padding: 5px 10px;
+    & > * {
+      transform: scale(0.8);
+    }
+  }
 `;
 
 const WalletButton = ({ connectWallet, currentAccount }) => (

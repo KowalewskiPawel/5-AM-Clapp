@@ -17,7 +17,7 @@ After going to the dapp website, user will have to login with his/her wallet, an
 - [Solidity](https://docs.soliditylang.org/en/v0.8.11/)
 - [Alchemy](https://www.alchemy.com/)
 - [React](https://reactjs.org/)
-- [Styed Components](https://styled-components.com/)
+- [Styled Components](https://styled-components.com/)
 
 ### Prerequisites
 
@@ -50,6 +50,10 @@ run `npx hardhat compile` command.
 ### Deploying Smart Contract
 
 Run `npx hardhat run scripts/deploy.js --network mumbai` command.
+
+## This has been created during ETHGlobal Road to Web3 Hackathon
+
+[5 AM Clapp - ETH Global Showcase](https://showcase.ethglobal.com/roadtoweb3/5-am-clapp)
 
 ### Live Preview
 

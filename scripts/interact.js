@@ -23,9 +23,7 @@ const FiveAmClappContract = new ethers.Contract(
     process.stdout.write(".");
   }, 1000);
 
-  await FiveAmClappContract.stakeCommitment({
-    value: 100,
-  });
+  await FiveAmClappContract.didStake();
 
   clearInterval(dotsIncrement);
   process.stdout.write("\n");

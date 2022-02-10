@@ -25,6 +25,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [stakedBet, setStakedBet] = useState(null);
   const [stakingError, setStakingError] = useState(false);
+  const [rewardsError, setRewardsError] = useState(false);
   const [withdrawingError, setWithdrawingError] = useState(false);
 
   const checkIfWalletIsConnected = async () => {
@@ -124,16 +125,17 @@ const App = () => {
     }
   };
 
-  const didStake = async () => {
+  const claimRewards = async () => {
     try {
-      const didStake = await dappContract.didStake();
-      const stake = ethers.utils.formatEther(didStake);
-
-      if (stake !== "0.0") {
-        setStakedBet(stake);
-      }
+      setIsLoading(true);
+      setRewardsError(false);
+      const rewardsTxn = await dappContract.claimReward();
+      await rewardsTxn.wait();
+      setIsLoading(false);
     } catch (error) {
       console.warn("Error: ", error);
+      setRewardsError(true);
+      setIsLoading(false);
     }
   };
 
@@ -151,30 +153,40 @@ const App = () => {
         FiveAmClapp.abi,
         signer
       );
-
       setDappContract(dappContract);
-
       const memberNFT = await dappContract.checkIfUserHasNFT();
       if (memberNFT.name) {
         setMemberNFT(transformMemberData(memberNFT));
         const balance = await signer.getBalance();
         const balanceInMatic = ethers.utils.formatEther(balance);
         setMemberBalance(balanceInMatic);
-        setIsDashboardOpen(true);
       }
       setIsLoading(false);
-      didStake();
+    };
+
+    const didStake = async () => {
+      try {
+        const didStake = await dappContract.didStake();
+        const stake = ethers.utils.formatEther(didStake);
+
+        if (stake !== "0.0") {
+          setStakedBet(stake);
+        }
+      } catch (error) {
+        console.warn("Error: ", error);
+      }
     };
 
     if (currentAccount) {
-      fetchNFTMetadata();
+      didStake();
     }
-  }, [currentAccount, memberBalance, stakeAmount]);
+    fetchNFTMetadata();
+  }, [currentAccount, memberNFT, isDashboardOpen]);
 
   return (
     <>
       <Navbar connectWallet={connectWallet} currentAccount={currentAccount} />
-      {!isDashboardOpen && (
+      {memberNFT === null && (
         <Hero
           mintNFT={mintNFT}
           currentAccount={currentAccount}
@@ -186,7 +198,7 @@ const App = () => {
           setIsDashboardOpen={setIsDashboardOpen}
         />
       )}
-      {isDashboardOpen && (
+      {memberNFT !== null && (
         <Dashboard
           memberBalance={memberBalance}
           memberNFT={memberNFT}
@@ -197,6 +209,8 @@ const App = () => {
           withdrawBet={withdrawBet}
           withdrawingError={withdrawingError}
           isLoading={isLoading}
+          rewardsError={rewardsError}
+          claimRewards={claimRewards}
         />
       )}
     </>
