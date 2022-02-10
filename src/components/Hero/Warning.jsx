@@ -9,6 +9,10 @@ const Warning = styled.span`
   letter-spacing: 0.03em;
 
   color: #ff5507;
+
+  @media (max-width: 700px) {
+    font-size: 12px;
+  }
 `;
 
 export default Warning;

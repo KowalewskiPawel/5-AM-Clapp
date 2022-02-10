@@ -31,6 +31,12 @@ const StyledButton = styled.button`
   &:hover {
     background: #f57d14;
   }
+
+  @media (max-width: 700px) {
+    & > * {
+      font-size: 18px;
+    }
+  }
 `;
 
 export default StyledButton;

@@ -8,6 +8,10 @@ const Title = styled.h1`
   line-height: 46px;
 
   color: #ffffff;
+
+  @media (max-width: 700px) {
+    font-size: 26px;
+  }
 `;
 
 export default Title;

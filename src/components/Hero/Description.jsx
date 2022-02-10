@@ -9,6 +9,10 @@ const Description = styled.article`
   letter-spacing: 0.03em;
 
   color: #ffffff;
+
+  @media (max-width: 700px) {
+    font-size: 12px;
+  }
 `;
 
 export default Description;

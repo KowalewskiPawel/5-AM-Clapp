@@ -20,7 +20,7 @@ const Logo = styled.h1`
 
   @media (max-width: 880px) {
     font-size: 1.2rem;
-    margin-right: 12%;
+    margin-right: 40%;
 
     & > img {
       top: 1.9rem;
@@ -28,6 +28,19 @@ const Logo = styled.h1`
       width: 1.2rem;
       height: auto;
     }
+  }
+
+  @media (max-width: 580px) {
+    margin-right: 32%;
+  }
+
+  @media (max-width: 480px) {
+    margin-right: 20%;
+  }
+
+  @media (max-width: 380px) {
+    margin-right: 10%;
+    margin-left: -2rem;
   }
 `;
 

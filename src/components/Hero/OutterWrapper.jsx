@@ -4,7 +4,6 @@ const OutterWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0px;
   gap: 20px;
 
   ${(props) =>
@@ -13,6 +12,10 @@ const OutterWrapper = styled.div`
       width: 100%;
       align-items: center;
     `}
+
+  @media (max-width: 700px) {
+    gap: 10px;
+  }
 `;
 
 export default OutterWrapper;

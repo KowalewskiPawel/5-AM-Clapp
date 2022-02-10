@@ -18,6 +18,12 @@ const StyledHero = styled.div`
   backdrop-filter: blur(4px);
 
   border-radius: 40px;
+
+  @media (max-width: 700px) {
+    margin: 10% 1rem;
+    width: auto;
+    padding: 2rem;
+  }
 `;
 
 export default StyledHero;
