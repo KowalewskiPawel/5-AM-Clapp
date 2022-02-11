@@ -30,16 +30,16 @@ const Logo = styled.h1`
     }
   }
 
-  @media (max-width: 580px) {
-    margin-right: 32%;
+  @media (max-width: 600px) {
+    margin-right: 28%;
   }
 
-  @media (max-width: 480px) {
-    margin-right: 20%;
+  @media (max-width: 500px) {
+    margin-right: 14%;
   }
 
-  @media (max-width: 380px) {
-    margin-right: 10%;
+  @media (max-width: 420px) {
+    margin-right: 8%;
     margin-left: -2rem;
   }
 `;
